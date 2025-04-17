@@ -3,7 +3,9 @@ from pathlib import Path
 from datetime import datetime
 from uuid import uuid4
 
-MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "scada_model_json.json"
+ROOT = Path(__file__).resolve().parents[2]
+MODEL_PATH = ROOT / "models" / "scada_model_json.json"
+
 with MODEL_PATH.open() as f:
     _MODEL = json.load(f)
 

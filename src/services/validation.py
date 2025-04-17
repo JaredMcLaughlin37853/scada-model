@@ -2,7 +2,9 @@ import json
 from pathlib import Path
 from jsonschema import Draft7Validator
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "models" / "scada-model.schema.json"
+ROOT = Path(__file__).resolve().parents[2]
+SCHEMA_PATH = ROOT / "models" / "scada-model.schema.json"
+
 with SCHEMA_PATH.open() as f:
     _schema = json.load(f)
 _validator = Draft7Validator(_schema)
