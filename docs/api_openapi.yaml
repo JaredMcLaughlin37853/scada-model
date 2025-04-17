@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: SCADA Design Assistant API
+  version: "0.1.0"
+paths:
+  /checklist:
+    post:
+      summary: Generate a SCADA checklist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../models/scada-model.schema.json'
+      responses:
+        '200':
+          description: Checklist generated
+          content:
+            application/json:
+              schema:
+                type: object

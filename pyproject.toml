@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scada-design-assistant"
+version = "0.1.0"
+description = "Web tool to generate SCADA design checklists from a JSON model"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "jsonschema",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "ruff",
+]

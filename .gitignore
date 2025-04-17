@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_cache/
+.venv/
+.idea/
+*.sqlite3
+.env
+checklists/

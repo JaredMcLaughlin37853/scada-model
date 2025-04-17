@@ -1,0 +1,176 @@
+{
+  "$schema": "https://example.com/scada-model.schema.json",
+  "metadata": {
+    "version": "0.3.0",
+    "generated": "2025-04-17",
+    "description": "Prototype SCADA impact model for substation design checklist generator with multi‑equipment dependency example"
+  },
+
+  "equipment": [
+    {
+      "id": "TRANSFORMER_EHV",
+      "name": "EHV Power Transformer",
+      "category": "primary",
+      "attributes": {
+        "voltage_class": "345/138 kV",
+        "has_ltc": false,
+        "cooling_type": "forced_oil"
+      },
+      "scada_points": [
+        { "point": "XFMR_STATUS", "description": "Transformer in‑service status" },
+        { "point": "XFMR_ALM", "description": "General alarm" }
+      ]
+    },
+
+    {
+      "id": "RELAY_87T_EHV",
+      "name": "XFMR Differential Relay (SEL‑487E)",
+      "category": "secondary",
+      "scada_points": [
+        { "point": "87T_TRIP", "description": "Trip bit" },
+        { "point": "87T_ALM", "description": "Relay alarm" }
+      ]
+    },
+
+    {
+      "id": "OIL_MONITOR",
+      "name": "Transformer Oil Monitor",
+      "category": "secondary",
+      "scada_points": [
+        { "point": "OIL_T", "description": "Oil temperature" },
+        { "point": "OIL_GAS", "description": "Gas accumulation" }
+      ]
+    },
+
+    {
+      "id": "LINE_138KV",
+      "name": "138 kV Transmission Line",
+      "category": "primary"
+    },
+
+    { "id": "BREAKER_138KV", "name": "138 kV Breaker", "category": "primary" },
+    { "id": "RELAY_421", "name": "Distance Relay SEL‑421", "category": "secondary" },
+    { "id": "RELAY_411L", "name": "Current Diff Relay SEL‑411L", "category": "secondary" },
+
+    { "id": "MUX_PCM", "name": "PCM Fiber Channel", "category": "secondary" },
+    { "id": "DFR_400", "name": "Digital Fault Recorder", "category": "secondary" },
+
+    /* =============  NEW EQUIPMENT FOR ADVANCED DEPENDENCY ============== */
+
+    {
+      "id": "TRANSFORMER_230_69",
+      "name": "230/69 kV Power Transformer",
+      "category": "primary",
+      "attributes": {
+        "voltage_class": "230/69 kV",
+        "has_ltc": true,
+        "cooling_type": "forced_oil"
+      }
+    },
+
+    { "id": "RELAY_87T_230_69", "name": "XFMR Differential Relay (SEL‑487E)", "category": "secondary" },
+    { "id": "LTC_CONTROLLER", "name": "LTC Position Controller", "category": "secondary" },
+    { "id": "OIL_PUMP_MONITOR", "name": "Oil Pump Monitor", "category": "secondary" },
+    { "id": "BUS_DIFF_RELAY", "name": "Bus Differential Relay SEL‑487B", "category": "secondary" },
+    { "id": "VT_69KV", "name": "69 kV Voltage Transformer", "category": "primary" },
+    { "id": "FIBER_SWITCH", "name": "Managed Fiber Ethernet Switch", "category": "secondary" }
+  ],
+
+  "rules": [
+    /* ------------------------------------------------------------------ */
+    {
+      "id": "RULE_LINE_138KV_COMPLETENESS",
+      "description": "Ensures all required secondary equipment is present for a new 138 kV line and generates SCADA checklist items.",
+      "trigger": {
+        "if_equipment_present": ["LINE_138KV"]
+      },
+      "requires": [
+        { "equipment_id": "BREAKER_138KV", "quantity": 2, "relationship": "terminates" },
+        { "equipment_id": "RELAY_421", "quantity": 1, "relationship": "protects" },
+        { "equipment_id": "RELAY_411L", "quantity": 1, "relationship": "protects" },
+        { "equipment_id": "MUX_PCM", "quantity": 1, "relationship": "communicates" },
+        { "equipment_id": "DFR_400", "quantity": 1 }
+      ],
+      "checklist_outputs": [
+        "Verify breaker 1 and breaker 2 status, trip, and lockout indications.",
+        "Verify SEL‑421 distance relay targets and alarms mapped.",
+        "Verify SEL‑411L current diff relay targets and alarms mapped.",
+        "Verify PCM channel alarms mapped.",
+        "Verify DFR trigger points mapped for line events."
+      ]
+    },
+
+    /* ------------------------------------------------------------------ */
+    {
+      "id": "RULE_FIBER_SWITCH_NETWORK_REDUNDANCY",
+      "description": "Whenever a PCM fiber channel is present, ensure a pair of managed fiber switches exists for redundant networking.",
+      "trigger": {
+        "if_equipment_present": ["MUX_PCM"]
+      },
+      "requires": [
+        { "equipment_id": "FIBER_SWITCH", "quantity": 2, "relationship": "network_path" }
+      ],
+      "checklist_outputs": [
+        "Verify redundant managed fiber Ethernet switches are installed and powered from independent supplies."
+      ]
+    },
+
+    /* ------------------------------------------------------------------ */
+    {
+      "id": "RULE_TRANSFORMER_230_69_DEP_CHAIN",
+      "description": "Cascading dependency rule: adding a 230/69 kV transformer triggers multiple secondary systems, some of which themselves trigger downstream rules.",
+
+      "trigger": {
+        "if_equipment_present": ["TRANSFORMER_230_69"]
+      },
+
+      "requires": [
+        /*  Always‑required protection  */
+        { "equipment_id": "RELAY_87T_230_69", "quantity": 1, "relationship": "protects" },
+
+        /*  LTC controller only if the transformer has an LTC  */
+        {
+          "equipment_id": "LTC_CONTROLLER",
+          "quantity": 1,
+          "relationship": "controls",
+          "condition": {
+            "parent_equipment_attribute": "has_ltc",
+            "equals": true
+          }
+        },
+
+        /*  Oil‑pump monitor only if forced‑oil cooling is specified  */
+        {
+          "equipment_id": "OIL_PUMP_MONITOR",
+          "quantity": 1,
+          "relationship": "monitors",
+          "condition": {
+            "parent_equipment_attribute": "cooling_type",
+            "equals": "forced_oil"
+          }
+        },
+
+        /*  Bus diff relay requirement depends on presence of VT  */
+        {
+          "equipment_id": "BUS_DIFF_RELAY",
+          "quantity": 1,
+          "relationship": "protects_bus",
+          "condition": {
+            "requires_equipment_present": ["VT_69KV"]
+          }
+        }
+      ],
+
+      /*  This rule also inherits all requirements from the network redundancy rule.  */
+      "requires_rules": ["RULE_FIBER_SWITCH_NETWORK_REDUNDANCY"],
+
+      "checklist_outputs": [
+        "Verify transformer differential relay (SEL‑487E) status, trip, and alarm points mapped.",
+        "Verify LTC raise/lower commands, position indication, and alarm points mapped (if LTC present).",
+        "Verify oil pump monitor status and alarm points mapped (if forced‑oil cooling).",
+        "Verify bus 69 kV VT wiring and bus differential relay targets mapped.",
+        "Ensure redundant fiber network checklist has been satisfied (see Rule RULE_FIBER_SWITCH_NETWORK_REDUNDANCY)."
+      ]
+    }
+  ]
+}
