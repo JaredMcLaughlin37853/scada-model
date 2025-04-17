@@ -1,19 +1,149 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "SCADA Equipment List",
+  "$id": "https://example.com/schemas/scada-model.schema.json",
+  "title": "SCADA Design Impact Model",
   "type": "object",
+  "required": ["metadata", "equipment", "rules"],
+  "additionalProperties": false,
+
   "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["version", "generated", "description"],
+      "properties": {
+        "version": { "type": "string" },
+        "generated": { "type": "string", "format": "date" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
     "equipment": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id"],
-        "properties": {
-          "id": { "type": "string" },
-          "attributes": { "type": "object" }
-        }
-      }
+      "items": { "$ref": "#/definitions/equipmentObject" }
+    },
+
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ruleObject" }
     }
   },
-  "required": ["equipment"]
+
+  "definitions": {
+    "equipmentCategory": {
+      "type": "string",
+      "enum": ["primary", "secondary"]
+    },
+
+    "attributeCondition": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": ["equipment_attribute", "equals"],
+          "properties": {
+            "equipment_attribute": { "type": "string" },
+            "equals": {}
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": ["parent_equipment_attribute", "equals"],
+          "properties": {
+            "parent_equipment_attribute": { "type": "string" },
+            "equals": {}
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": ["requires_equipment_present"],
+          "properties": {
+            "requires_equipment_present": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+
+    "scadaPoint": {
+      "type": "object",
+      "required": ["point", "description"],
+      "properties": {
+        "point": { "type": "string" },
+        "description": { "type": "string" },
+        "condition": { "$ref": "#/definitions/attributeCondition" }
+      },
+      "additionalProperties": false
+    },
+
+    "equipmentObject": {
+      "type": "object",
+      "required": ["id", "name", "category"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "$ref": "#/definitions/equipmentCategory" },
+        "attributes": {
+          "type": "object",
+          "description": "Free‑form attribute bag; rule conditions may reference any of these keys.",
+          "additionalProperties": true
+        },
+        "scada_points": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/scadaPoint" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "triggerObject": {
+      "type": "object",
+      "required": ["if_equipment_present"],
+      "properties": {
+        "if_equipment_present": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "requireItem": {
+      "type": "object",
+      "required": ["equipment_id", "quantity"],
+      "properties": {
+        "equipment_id": { "type": "string" },
+        "quantity": { "type": "integer", "minimum": 1 },
+        "relationship": { "type": "string" },
+        "condition": { "$ref": "#/definitions/attributeCondition" }
+      },
+      "additionalProperties": false
+    },
+
+    "ruleObject": {
+      "type": "object",
+      "required": ["id", "description", "trigger"],
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "trigger": { "$ref": "#/definitions/triggerObject" },
+        "requires": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/requireItem" }
+        },
+        "requires_rules": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "checklist_outputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }
