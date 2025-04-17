@@ -1,13 +1,9 @@
-############################
-#   pyproject.toml (OK)    #
-############################
-
 [project]
 name = "scada-design-assistant"
 version = "0.1.0"
 description = "Web tool to generate SCADA design checklists from a JSON model"
 readme = "README.md"
-authors = [{ name = "Jared McLaughlin", email = "you@example.com" }]
+authors = [{ name = "Jared McLaughlin", email = "jmclaughlin@burnsmcd.com" }]
 requires-python = ">=3.9"
 
 # ---- RUNTIME DEPENDENCIES (array‑of‑strings) -------------
