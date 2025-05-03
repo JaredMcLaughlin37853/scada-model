@@ -162,7 +162,10 @@
       },
 
       "requires": [
-        { "equipment_id": "RELAY_87T_230_69", "quantity": 1, "relationship": "protects" },
+        { "equipment_id": "RELAY_87T_230_69", 
+          "quantity": 1, 
+          "relationship": "protects" 
+        },
 
         {
           "equipment_id": "LTC_CONTROLLER",
