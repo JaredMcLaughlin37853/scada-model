@@ -1,0 +1,72 @@
+{
+  "$schema": "https://example.com/scada-model.schema.json",
+  "metadata": {
+    "version": "0.3.1",
+    "generated": "2025-04-17",
+    "description": "Prototype SCADA impact model with conditional SCADA‑point syntax demonstrated"
+  },
+
+  "equipment": [
+    {
+      "id": "string",
+      "name": "string",
+      "category": ["primary", "secondary"],
+      "attributes": {
+        "voltage_class": ["transmission", "subtransmission", "distribution"],
+        "attribute_name": "key: attribute name, value: boolean",
+      },
+      "scada_points": [
+        { "point": ["status","control","analog input", "analog output", "accumulator"], 
+          "description": "string" 
+        },
+        {
+          "point": ["status","control","analog input", "analog output", "accumulator"],
+          "description": "string",
+          "condition": {"equipment_attribute": "attribute name", "equals": "boolean" }
+        }
+      ]
+    }
+  ],
+
+  "rules": [
+    {
+      "id": "string",
+      "description": "string",
+
+      "trigger": {
+        "if_equipment_present": ["equipment id"]
+      },
+
+      "requires": [
+        { "equipment_id": "equipment id", 
+          "quantity": "number", 
+          "relationship": ["controls", "protects", "monitors"]},
+
+        {
+          "equipment_id": "equipment id",
+          "quantity": "number",
+          "relationship": ["controls", "protects", "monitors"],
+          "condition": {
+            "parent_equipment_attribute": "parent attribute key",
+            "equals": "boolean"
+          }
+        },
+
+        {
+          "equipment_id": "equipment id",
+          "quantity": "number",
+          "relationship": ["controls", "protects", "monitors"],
+          "condition": {
+            "requires_equipment_present": ["equipment id"]
+          }
+        }
+      ],
+
+      "requires_rules": ["required rule"],
+
+      "checklist_outputs": [
+        "List of items to check"
+      ]
+    }
+  ]
+}

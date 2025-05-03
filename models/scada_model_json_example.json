@@ -8,32 +8,8 @@
 
   "equipment": [
     {
-      "id": "CIRCUIT_BREAKER_100KV_OR_HIGHER",
-      "name": "100kv-or-higher Circuit Breaker",
-      "category": "primary",
-      "attributes": {
-        "voltage_class": ">= 100 kV"
-      },
-      "scada_points": [
-        { "type": "status",
-          "description": "Breaker position indication",
-          "pattern": "{nominal voltage}KV BREAKER B{breaker number} STATUS"
-        },
-        { "point": "status",
-          "description": "Breaker critical alarm", 
-          "pattern": "{nominal voltage}KV BREAKER B{number} CRITICAL ALARM"
-        }
-        {
-          "point": "control",
-          "description": "Breaker control",
-          "pattern":"{nominal voltage}KV BREAKER B{breaker number}",
-          "function": "OPEN/CLOSE"
-        }
-      ]
-    },
-    {
-      "id": "T_LINE_SWITCH",
-      "name": "Transmission Line Switch",
+      "id": "TRANSFORMER_EHV",
+      "name": "EHV Power Transformer",
       "category": "primary",
       "attributes": {
         "voltage_class": "345/138 kV",
@@ -55,6 +31,89 @@
         }
       ]
     },
+
+    {
+      "id": "RELAY_87T_EHV",
+      "name": "XFMR Differential Relay (SEL‑487E)",
+      "category": "secondary",
+      "scada_points": [
+        { "point": "87T_TRIP", "description": "Trip bit" },
+        { "point": "87T_ALM", "description": "Relay alarm" }
+      ]
+    },
+
+    {
+      "id": "OIL_MONITOR",
+      "name": "Transformer Oil Monitor",
+      "category": "secondary",
+      "scada_points": [
+        { "point": "OIL_T", "description": "Oil temperature" },
+        { "point": "OIL_GAS", "description": "Gas accumulation" }
+      ]
+    },
+
+    {
+      "id": "LINE_138KV",
+      "name": "138 kV Transmission Line",
+      "category": "primary"
+    },
+
+    { "id": "BREAKER_138KV", 
+      "name": "138 kV Breaker", 
+      "category": "primary" 
+    },
+
+    { "id": "RELAY_421", 
+      "name": "Distance Relay SEL‑421", 
+      "category": "secondary" 
+    },
+
+    { "id": "RELAY_411L", 
+      "name": "Current Diff Relay SEL‑411L", 
+      "category": "secondary" 
+    },
+
+    { "id": "MUX_PCM", 
+      "name": "PCM Fiber Channel", 
+      "category": "secondary" 
+    },
+
+    { "id": "DFR_400", 
+      "name": "Digital Fault Recorder", 
+      "category": "secondary" 
+    },
+
+    {
+      "id": "TRANSFORMER_230_69",
+      "name": "230/69 kV Power Transformer",
+      "category": "primary",
+      "attributes": {
+        "voltage_class": "230/69 kV",
+        "has_ltc": true,
+        "cooling_type": "forced_oil"
+      },
+      "scada_points": [
+        { "point": "XFMR_STATUS", "description": "Transformer in‑service status" },
+        { "point": "XFMR_ALM", "description": "General alarm" },
+        {
+          "point": "LTC_POS",
+          "description": "LTC tap position (valid only if transformer has LTC)",
+          "condition": { "equipment_attribute": "has_ltc", "equals": true }
+        },
+        {
+          "point": "OIL_PUMP_STAT",
+          "description": "Oil‑pump running status (forced‑oil units only)",
+          "condition": { "equipment_attribute": "cooling_type", "equals": "forced_oil" }
+        }
+      ]
+    },
+
+    { "id": "RELAY_87T_230_69", "name": "XFMR Differential Relay (SEL‑487E)", "category": "secondary" },
+    { "id": "LTC_CONTROLLER", "name": "LTC Position Controller", "category": "secondary" },
+    { "id": "OIL_PUMP_MONITOR", "name": "Oil Pump Monitor", "category": "secondary" },
+    { "id": "BUS_DIFF_RELAY", "name": "Bus Differential Relay SEL‑487B", "category": "secondary" },
+    { "id": "VT_69KV", "name": "69 kV Voltage Transformer", "category": "primary" },
+    { "id": "FIBER_SWITCH", "name": "Managed Fiber Ethernet Switch", "category": "secondary" }
   ],
 
   "rules": [
@@ -103,10 +162,7 @@
       },
 
       "requires": [
-        { "equipment_id": "RELAY_87T_230_69", 
-          "quantity": 1, 
-          "relationship": "protects" 
-        },
+        { "equipment_id": "RELAY_87T_230_69", "quantity": 1, "relationship": "protects" },
 
         {
           "equipment_id": "LTC_CONTROLLER",
