@@ -19,27 +19,29 @@ Update %PATH% extensions
 wsl ~
 
 **from the ubuntu CLI**
-sudo apt update && sudo apt upgrade -y
-sudo apt install build-essential python3 python3-venv python3-pip git
+sudo apt update && sudo apt upgrade -y  
+sudo apt install build-essential python3 python3-venv python3-pip git  
 
 **clone repo**
-mkdir projects # create a directory to store your projects if you don't have one created yet
+```
+mkdir projects # create a directory to store your projects if you don't have one created yet  
 cd projects
-git clone https://github.com/JaredMcLaughlin37853/scada-model.git
-cd scada-model
+git clone https://github.com/JaredMcLaughlin37853/scada-model.git  
+cd scada-model  
+```
 
 **install poetry**
-curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2  
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  
+source ~/.bashrc  
 
-poetry install --with dev      # creates .venv/ (or ~/.cache/pypoetry/… depending on config)
+poetry install --with dev      # creates .venv/ (or ~/.cache/pypoetry/… depending on config)  
 
 
 ## Daily Workflow (assuming WSL evironment)
-wsl ~
-cd ~/projects/scada-model
-git pull               # keep up‑to‑date
-code .                 # start coding
+wsl ~  
+cd ~/projects/scada-model  
+git pull               # keep up‑to‑date  
+code .                 # start coding  
 
 The interactive OpenAPI docs will be available at `http://localhost:8000/docs`.
