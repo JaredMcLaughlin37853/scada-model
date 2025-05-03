@@ -16,11 +16,13 @@ Update %PATH% extensions
 
 ## Ubuntu distro and install steps (you'll have to follow slightly different steps if running in a Windows env)
 **from the powershell**
-wsl ~
+`wsl ~`
 
 **from the ubuntu CLI**
+```
 sudo apt update && sudo apt upgrade -y  
-sudo apt install build-essential python3 python3-venv python3-pip git  
+sudo apt install build-essential python3 python3-venv python3-pip git
+```  
 
 **clone repo**
 ```
@@ -31,17 +33,20 @@ cd scada-model
 ```
 
 **install poetry**
+```
 curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2  
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  
 source ~/.bashrc  
-
-poetry install --with dev      # creates .venv/ (or ~/.cache/pypoetry/… depending on config)  
+poetry install --with dev      # creates .venv/ (or ~/.cache/pypoetry/… depending on config) 
+``` 
 
 
 ## Daily Workflow (assuming WSL evironment)
+```
 wsl ~  
 cd ~/projects/scada-model  
 git pull               # keep up‑to‑date  
 code .                 # start coding  
+```
 
 The interactive OpenAPI docs will be available at `http://localhost:8000/docs`.
